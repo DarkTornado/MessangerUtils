@@ -74,6 +74,7 @@ public class MainActivity extends Activity {
         layout0.setOrientation(1);
         toolbar = Utils.createToolBar(this, "메신저 도구");
         Switch on = new Switch(this);
+        on.setChecked(Utils.rootLoad(this, "all_on", false));
         on.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton swit, boolean onoff) {

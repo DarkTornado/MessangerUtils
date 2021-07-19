@@ -5,10 +5,16 @@ import android.app.PendingIntent;
 import android.app.RemoteInput;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
+
+import com.darktornado.msgutils.botapi.ImageDB;
+import com.darktornado.msgutils.botapi.Replier;
+
+import java.io.ByteArrayOutputStream;
 
 public class NotiListener extends NotificationListenerService {
 
@@ -28,62 +34,37 @@ public class NotiListener extends NotificationListenerService {
                     boolean isGroupChat = room != null;
                     if (room == null) room = sender;
                     Replier replier = new Replier(this, sbn.getNotification().actions, act);
-                    chatHook(room, msg, sender, isGroupChat, replier);
+                    ImageDB imageDB = new ImageDB(this, sbn);
+                    chatHook(room, msg, sender, isGroupChat, replier, imageDB);
                 }
             }
         }
     }
 
-    private void chatHook(String room, String msg, String sender, boolean isGroupChat, Replier replier) {
-        toast("room: " + room + "\nmsg: " + msg + "\nsender: " + sender + "\nisGroupChat: " + isGroupChat);
+    private void chatHook(String room, String msg, String sender, boolean isGroupChat, Replier replier, ImageDB imageDB) {
+        /*
+        채팅 & 이미지 수신 테스트용 소스 코드
+        if (imageDB.getImage() != null) printImage(imageDB);
+        else toast("room: " + room + "\nmsg: " + msg + "\nsender: " + sender + "\nisGroupChat: " + isGroupChat);
+        */
     }
+
+    /*
+    이미지 수신 테스트용 소스 코드
+    private void printImage(ImageDB imageDB) {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        imageDB.getImageBitmap().compress(Bitmap.CompressFormat.PNG, 100, stream);
+
+        Intent intent = new Intent(this, ToastService.class);
+        intent.putExtra("image", stream.toByteArray());
+        startService(intent);
+    }
+    */
 
     private void toast(String msg) {
         Intent intent = new Intent(this, ToastService.class);
         intent.putExtra("msg", msg);
         startService(intent);
-    }
-
-    public static class Replier {
-
-        private Context ctx;
-        private Notification.Action[] actions;
-        private Notification.Action action;
-
-        public Replier(Context ctx, Notification.Action[] actions, Notification.Action action) {
-            this.ctx = ctx;
-            this.actions = actions;
-            this.action = action;
-        }
-
-        public void reply(String value) {
-            Intent sendIntent = new Intent();
-            Bundle msg = new Bundle();
-            for (RemoteInput inputable : action.getRemoteInputs()) {
-                msg.putCharSequence(inputable.getResultKey(), value);
-            }
-            RemoteInput.addResultsToIntent(action.getRemoteInputs(), sendIntent, msg);
-            try {
-                action.actionIntent.send(ctx, 0, sendIntent);
-            } catch (PendingIntent.CanceledException e) {
-
-            }
-        }
-
-        public boolean reply(String room, String msg) {
-            return false;
-        }
-
-        public boolean markAsRead() {
-            try {
-                if (actions == null) return false;
-                actions[0].actionIntent.send(ctx, 1, new Intent());
-                return true;
-            } catch (PendingIntent.CanceledException e) {
-                return false;
-            }
-        }
-
     }
 
 }
