@@ -1,12 +1,16 @@
 package com.darktornado.msgutils;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.LinearLayout;
+import android.widget.Switch;
 import android.widget.Toast;
 import android.widget.Toolbar;
 
@@ -69,6 +73,15 @@ public class MainActivity extends Activity {
         LinearLayout layout0 = new LinearLayout(this);
         layout0.setOrientation(1);
         toolbar = Utils.createToolBar(this, "메신저 도구");
+        Switch on = new Switch(this);
+        on.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton swit, boolean onoff) {
+                Utils.rootSave(MainActivity.this, "all_on", onoff);
+            }
+        });
+        toolbar.addView(on, new Toolbar.LayoutParams(-2, -2, Gravity.RIGHT));
+
         setActionBar(toolbar);
         layout0.addView(toolbar);
 

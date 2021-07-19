@@ -35,7 +35,13 @@ public class NotiListener extends NotificationListenerService {
     }
 
     private void chatHook(String room, String msg, String sender, boolean isGroupChat, Replier replier) {
+        toast("room: " + room + "\nmsg: " + msg + "\nsender: " + sender + "\nisGroupChat: " + isGroupChat);
+    }
 
+    private void toast(String msg) {
+        Intent intent = new Intent(this, ToastService.class);
+        intent.putExtra("msg", msg);
+        startService(intent);
     }
 
     public static class Replier {

@@ -58,7 +58,7 @@ public class BottomNavigationLayout extends FrameLayout {
 
     public void addBottomButton(String text, int res, Drawable drawable, View.OnClickListener listener) {
         if (drawable == null) drawable = new ColorDrawable(Color.TRANSPARENT);
-        addBottomButton(text, res, drawable, listener, 12, Color.BLACK);
+        addBottomButton(text, res, drawable, listener, 12, Color.parseColor("#F48FB1"));
     }
 
     public void addBottomButton(String text, int res, Drawable drawable, View.OnClickListener listener, float size, int color){
