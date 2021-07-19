@@ -3,5 +3,6 @@
     <style name="Theme.MsgUtils" parent="android:Theme.Material.Light.NoActionBar">
         <!-- Primary brand color. -->
         <!-- Customize your theme here. -->
+        <item name="android:colorControlActivated">#F06292</item>
     </style>
 </resources>
