@@ -1,11 +1,7 @@
 package com.darktornado.msgutils;
 
 import android.app.Notification;
-import android.app.PendingIntent;
-import android.app.RemoteInput;
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
 import android.service.notification.NotificationListenerService;
@@ -13,8 +9,6 @@ import android.service.notification.StatusBarNotification;
 
 import com.darktornado.msgutils.botapi.ImageDB;
 import com.darktornado.msgutils.botapi.Replier;
-
-import java.io.ByteArrayOutputStream;
 
 public class NotiListener extends NotificationListenerService {
 
@@ -29,7 +23,7 @@ public class NotiListener extends NotificationListenerService {
                         act.title.toString().toLowerCase().contains("답장")) {
                     Bundle bundle = sbn.getNotification().extras;
                     String sender = bundle.getString("android.title");
-                    String msg = bundle.getString("android.text");
+                    String msg = bundle.get("android.text").toString();
                     String room = bundle.getString(Build.VERSION.SDK_INT > 23 ? "android.summaryText" : "android.subText");
                     boolean isGroupChat = room != null;
                     if (room == null) room = sender;

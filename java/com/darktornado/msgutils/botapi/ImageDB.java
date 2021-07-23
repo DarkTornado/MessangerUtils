@@ -1,6 +1,5 @@
 package com.darktornado.msgutils.botapi;
 
-import android.app.Notification;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;

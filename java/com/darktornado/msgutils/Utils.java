@@ -20,7 +20,7 @@ import java.io.InputStreamReader;
 public class Utils {
     public static final int TYPE_SIMPLE = 1;
     public static final int TYPE_JS = 2;
-    public static final int TYPE_MSG = 3;
+    public static final int TYPE_CHAT_LOG = 3;
     public static final int TYPE_SETTINGS = 4;
 
     public static Toolbar createToolBar(final Activity ctx, String title) {

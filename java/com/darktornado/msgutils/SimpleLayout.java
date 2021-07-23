@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.graphics.Color;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -45,6 +46,12 @@ public class SimpleLayout extends BaseLayout {
 
                 break;
         }
+    }
+
+    public void updateOptionsMenu(Menu menu){
+        menu.clear();
+        menu.add(0, 0, 0, "추가");
+        menu.add(0, 1, 0, "모두 삭제");
     }
 
     private void init() {
