@@ -34,7 +34,7 @@ public class MainActivity extends Activity {
                 script.onOptionsItemSelected(item.getItemId());
                 break;
             case Utils.TYPE_CHAT_LOG:
-//                log.onOptionsItemSelected(item.getItemId());
+                log.onOptionsItemSelected(item.getItemId());
                 break;
             case Utils.TYPE_SETTINGS:
 //                settings.onOptionsItemSelected(item.getItemId());
@@ -99,7 +99,7 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View view) {
                 layout.replace(log.view);
-//                log.updateOptionsMenu(menu);
+                log.updateOptionsMenu(menu);
                 type = Utils.TYPE_CHAT_LOG;
             }
         });

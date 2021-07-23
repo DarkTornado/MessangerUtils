@@ -29,18 +29,26 @@ public class NotiListener extends NotificationListenerService {
                     if (room == null) room = sender;
                     Replier replier = new Replier(this, sbn.getNotification().actions, act);
                     ImageDB imageDB = new ImageDB(this, sbn);
-                    chatHook(room, msg, sender, isGroupChat, replier, imageDB);
+                    long chatLogId = bundle.getLong("chatLogId");
+                    chatHook(room, msg, sender, isGroupChat, replier, imageDB, chatLogId);
                 }
             }
         }
     }
 
-    private void chatHook(String room, String msg, String sender, boolean isGroupChat, Replier replier, ImageDB imageDB) {
+    private void chatHook(String room, String msg, String sender, boolean isGroupChat, Replier replier, ImageDB imageDB, long chatLogId) {
         /*
         채팅 & 이미지 수신 테스트용 소스 코드
         if (imageDB.getImage() != null) printImage(imageDB);
         else toast("room: " + room + "\nmsg: " + msg + "\nsender: " + sender + "\nisGroupChat: " + isGroupChat);
         */
+
+        try {
+            SQLManager sql = new SQLManager(this, room);
+            sql.insert(chatLogId, sender, msg);
+        }catch (Exception e){
+            toast(e.toString());
+        }
     }
 
     /*
