@@ -43,7 +43,6 @@ public class SQLManager extends SQLiteOpenHelper {
         while (cursor.moveToNext()) {
             String name = cursor.getString(cursor.getColumnIndex("name"));
             if (!name.equals("android_metadata")) list.add(name);
-            cursor.moveToNext();
         }
         return list.toArray(new String[0]);
     }
