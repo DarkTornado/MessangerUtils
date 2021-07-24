@@ -107,7 +107,7 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View view) {
                 layout.replace(settings.view);
-//                settings.updateOptionsMenu(menu);
+                settings.updateOptionsMenu(menu);
                 type = Utils.TYPE_SETTINGS;
             }
         });
