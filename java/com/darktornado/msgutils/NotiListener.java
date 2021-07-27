@@ -43,12 +43,24 @@ public class NotiListener extends NotificationListenerService {
         else toast("room: " + room + "\nmsg: " + msg + "\nsender: " + sender + "\nisGroupChat: " + isGroupChat);
         */
 
-        try {
-            SQLManager sql = new SQLManager(this, room);
-            sql.insert(chatLogId, sender, msg);
-        }catch (Exception e){
-            toast(e.toString());
+        /* 단순 자동응답 */
+        if (Utils.rootLoad(this, "on0", true)) {
+
         }
+        /* 자바스크립트 */
+        if (Utils.rootLoad(this, "on0", true)) {
+
+        }
+        /* 채팅 기록 */
+        if (Utils.rootLoad(this, "on0", true)) {
+            try {
+                SQLManager sql = new SQLManager(this, room);
+                sql.insert(chatLogId, sender, msg);
+            } catch (Exception e) {
+                toast("채팅 기록 저장 실패\n" + e.toString());
+            }
+        }
+
     }
 
     /*

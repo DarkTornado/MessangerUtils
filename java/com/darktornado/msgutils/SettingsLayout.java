@@ -92,7 +92,7 @@ public class SettingsLayout extends BaseLayout {
             sws[n].setTextColor(Color.BLACK);
             sws[n].setId(n);
             sws[n].setPadding(pad, pad2, pad, pad2);
-            sws[n].setChecked(Utils.rootLoad(ctx, "on" + n, false));
+            sws[n].setChecked(Utils.rootLoad(ctx, "on" + n, true));
             sws[n].setOnCheckedChangeListener((swit, onoff) -> Utils.rootSave(ctx, "on" + swit.getId(), onoff));
             layout.addView(sws[n]);
         }
