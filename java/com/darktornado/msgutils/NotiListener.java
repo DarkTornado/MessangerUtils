@@ -10,7 +10,12 @@ import android.service.notification.StatusBarNotification;
 import com.darktornado.msgutils.botapi.ImageDB;
 import com.darktornado.msgutils.botapi.Replier;
 
+import java.util.HashMap;
+
 public class NotiListener extends NotificationListenerService {
+
+    private HashMap<String, String> preChat = new HashMap<>();
+    private HashMap<String, Replier> session = new HashMap<>();
 
     @Override
     public void onNotificationPosted(final StatusBarNotification sbn) {
@@ -42,17 +47,33 @@ public class NotiListener extends NotificationListenerService {
         if (imageDB.getImage() != null) printImage(imageDB);
         else toast("room: " + room + "\nmsg: " + msg + "\nsender: " + sender + "\nisGroupChat: " + isGroupChat);
         */
+        session.put(room, replier);
 
         /* 단순 자동응답 */
         if (Utils.rootLoad(this, "on0", true)) {
 
+            //특정 방에서만 작동
+            if (!roomCheck(room, 0)) return;
+
+            //도배 방지
+            if (Utils.rootLoad(this, "preventCover", true)) {
+                String preChat = this.preChat.get(room);
+                if (msg.equals(preChat)) return;
+                this.preChat.put(room, msg);
+            }
+
+            //기능 실행
+            SimpleReplier simple = new SimpleReplier(this);
+            String result = simple.execute(room, msg, sender, isGroupChat, replier);
+            if (result != null) toast("단순 자동응답 기능 실행 실패\n" + result);
         }
         /* 자바스크립트 */
-        if (Utils.rootLoad(this, "on0", true)) {
+        if (Utils.rootLoad(this, "on1", true)) {
 
         }
         /* 채팅 기록 */
-        if (Utils.rootLoad(this, "on0", true)) {
+        if (Utils.rootLoad(this, "on2", true)) {
+            if(!roomCheck(room, 2)) return;
             try {
                 SQLManager sql = new SQLManager(this, room);
                 sql.insert(chatLogId, sender, msg);
@@ -62,6 +83,24 @@ public class NotiListener extends NotificationListenerService {
         }
 
     }
+
+
+    private boolean roomCheck(String room, int type) {
+        int roomType = Utils.rootLoad(this, "roomType" + type, 0);
+        if (roomType == 0) return true;
+        String cache = Utils.rootRead(this, "roomList" + type);
+        if (cache == null) return roomType == 2;
+        if (cache.equals("")) return roomType == 2;
+        String[] list = cache.split("\n");
+        for (String rr : list) {
+            if (rr.equals(room)) {
+                if (roomType == 1) return true;
+                if (roomType == 2) return false;
+            }
+        }
+        return roomType == 2;
+    }
+
 
     /*
     이미지 수신 테스트용 소스 코드

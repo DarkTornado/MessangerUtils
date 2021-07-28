@@ -2,7 +2,6 @@ package com.darktornado.msgutils;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.graphics.Color;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -67,19 +66,16 @@ public class SimpleLayout extends BaseLayout {
             ListView list = new ListView(ctx);
             list.setAdapter(adapter);
             list.setFastScrollEnabled(true);
-            list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> adapterView, View view, int pos, long id) {
-                    int index = 0;
-                    String text = ((TextView) view).getText().toString();
-                    for (int n = 0; n < names.size(); n++) {
-                        if (text.equals(names.get(n))) {
-                            index = n;
-                            break;
-                        }
+            list.setOnItemClickListener((adapterView, view, pos, id) -> {
+                int index = 0;
+                String text = ((TextView) view).getText().toString();
+                for (int n = 0; n < names.size(); n++) {
+                    if (text.equals(names.get(n))) {
+                        index = n;
+                        break;
                     }
-                    editDialog(index);
                 }
+                editDialog(index);
             });
             txt.addTextChangedListener(new TextWatcher() {
                 @Override
@@ -178,14 +174,9 @@ public class SimpleLayout extends BaseLayout {
             }
             radio[datum.roomType].setChecked(true);
             radios.setPadding(0, 0, 0, dip2px(5));
-            radios.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(RadioGroup group, int checkedId) {
-                    datum.roomType = checkedId;
-                }
-            });
+            radios.setOnCheckedChangeListener((group, checkedId) -> datum.roomType = checkedId);
             layout.addView(radios);
-            String[] modes = {"채팅 내용이 일치", "시작 부분이 일치", "채팅 내용이 포함"};
+            String[] modes = {"채팅 내용이 일치", "시작 부분이 일치", "채팅 내용에 포함"};
             Spinner spin = new Spinner(ctx);
             final ArrayAdapter adapter = new ArrayAdapter(ctx, android.R.layout.simple_list_item_1, modes);
             spin.setAdapter(adapter);
@@ -237,62 +228,56 @@ public class SimpleLayout extends BaseLayout {
             scroll.addView(layout);
             dialog.setView(scroll);
             dialog.setNegativeButton("취소", null);
-            if (pos != -1) dialog.setNeutralButton("삭제", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    StringBuilder src = new StringBuilder();
-                    boolean added = false;
-                    for (int n = 0; n < data.length; n++) {
-                        if (pos == n) continue;
-                        if (added) src.append(",");
-                        src.append(data[n].toJson());
-                        added = true;
-                    }
-                    Utils.rootSave(ctx, "reply_data.json", "[" + src.toString() + "]");
-                    toast("삭제되었습니다.");
-                    updateData();
-                    SimpleLayout.this.adapter.notifyDataSetChanged();
+            if (pos != -1) dialog.setNeutralButton("삭제", (dialog1, which) -> {
+                StringBuilder src = new StringBuilder();
+                boolean added = false;
+                for (int n = 0; n < data.length; n++) {
+                    if (pos == n) continue;
+                    if (added) src.append(",");
+                    src.append(data[n].toJson());
+                    added = true;
                 }
+                Utils.rootSave(ctx, "reply_data.json", "[" + src.toString() + "]");
+                toast("삭제되었습니다.");
+                updateData();
+                SimpleLayout.this.adapter.notifyDataSetChanged();
             });
-            dialog.setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    try {
-                        String que = txt2.getText().toString();
-                        String ans = txt4.getText().toString();
-                        if (que.equals("") || ans.equals("")) {
-                            toast("입력되지 않은 값이 있습니다.");
-                            editDialog(pos);
-                        } else {
-                            datum.input = que;
-                            datum.output = ans;
-                            if (pos == -1) {
-                                StringBuilder src = new StringBuilder();
-                                boolean added = false;
-                                for (int n = 0; n < data.length; n++) {
-                                    if (n > 0) src.append(",");
-                                    src.append(data[n].toJson());
-                                    added = true;
-                                }
-                                if (added) src.append(",");
-                                src.append(datum.toJson());
-                                Utils.rootSave(ctx, "reply_data.json", "[" + src.toString() + "]");
-                            } else {
-                                data[pos] = datum;
-                                StringBuilder src = new StringBuilder();
-                                for (int n = 0; n < data.length; n++) {
-                                    if (n > 0) src.append(",");
-                                    src.append(data[n].toJson());
-                                }
-                                Utils.rootSave(ctx, "reply_data.json", "[" + src.toString() + "]");
+            dialog.setPositiveButton("확인", (dialog12, which) -> {
+                try {
+                    String que = txt2.getText().toString();
+                    String ans = txt4.getText().toString();
+                    if (que.equals("") || ans.equals("")) {
+                        toast("입력되지 않은 값이 있습니다.");
+                        editDialog(pos);
+                    } else {
+                        datum.input = que;
+                        datum.output = ans;
+                        if (pos == -1) {
+                            StringBuilder src = new StringBuilder();
+                            boolean added = false;
+                            for (int n = 0; n < data.length; n++) {
+                                if (n > 0) src.append(",");
+                                src.append(data[n].toJson());
+                                added = true;
                             }
-                            toast("저장되었습니다.");
-                            updateData();
-                            SimpleLayout.this.adapter.notifyDataSetChanged();
+                            if (added) src.append(",");
+                            src.append(datum.toJson());
+                            Utils.rootSave(ctx, "reply_data.json", "[" + src.toString() + "]");
+                        } else {
+                            data[pos] = datum;
+                            StringBuilder src = new StringBuilder();
+                            for (int n = 0; n < data.length; n++) {
+                                if (n > 0) src.append(",");
+                                src.append(data[n].toJson());
+                            }
+                            Utils.rootSave(ctx, "reply_data.json", "[" + src.toString() + "]");
                         }
-                    } catch (Exception e) {
-                        toast(e.toString());
+                        toast("저장되었습니다.");
+                        updateData();
+                        SimpleLayout.this.adapter.notifyDataSetChanged();
                     }
+                } catch (Exception e) {
+                    toast(e.toString());
                 }
             });
             dialog.show();
