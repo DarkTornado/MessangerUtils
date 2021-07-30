@@ -1,15 +1,26 @@
 package com.darktornado.msgutils;
 
 import android.app.Notification;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
 
+import com.darktornado.library.PrimitiveWrapFactory;
 import com.darktornado.msgutils.botapi.ImageDB;
 import com.darktornado.msgutils.botapi.Replier;
 
+import org.mozilla.javascript.Function;
+import org.mozilla.javascript.ImporterTopLevel;
+import org.mozilla.javascript.ScriptableObject;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.HashMap;
 
 public class NotiListener extends NotificationListenerService {
@@ -67,23 +78,31 @@ public class NotiListener extends NotificationListenerService {
             String result = simple.execute(room, msg, sender, isGroupChat, replier);
             if (result != null) toast("단순 자동응답 기능 실행 실패\n" + result);
         }
+
         /* 자바스크립트 */
         if (Utils.rootLoad(this, "on1", true)) {
-
+		
         }
+
         /* 채팅 기록 */
         if (Utils.rootLoad(this, "on2", true)) {
-            if(!roomCheck(room, 2)) return;
+            if (!roomCheck(room, 2)) return;
             try {
                 SQLManager sql = new SQLManager(this, room);
-                sql.insert(chatLogId, sender, msg);
+                if (imageDB.getImage() == null) {
+                    sql.insert(chatLogId, sender, msg, SQLManager.TYPE_MSG);
+                } else {
+                    sql.insert(chatLogId, sender, msg, SQLManager.TYPE_IMAGE);
+                    File file = new File(SQLManager.PATH + "images/" + chatLogId + ".jpg");
+                    FileOutputStream fos = new FileOutputStream(file);
+                    imageDB.getImageBitmap().compress(Bitmap.CompressFormat.JPEG, 90, fos);
+                }
             } catch (Exception e) {
                 toast("채팅 기록 저장 실패\n" + e.toString());
             }
         }
 
     }
-
 
     private boolean roomCheck(String room, int type) {
         int roomType = Utils.rootLoad(this, "roomType" + type, 0);
@@ -100,7 +119,6 @@ public class NotiListener extends NotificationListenerService {
         }
         return roomType == 2;
     }
-
 
     /*
     이미지 수신 테스트용 소스 코드

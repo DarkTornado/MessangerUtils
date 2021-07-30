@@ -1,6 +1,8 @@
 package com.darktornado.msgutils;
 
 import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
@@ -110,6 +112,10 @@ public class Utils {
         }
     }
 
+    public static void copyToClipboard(Context ctx, String value) {
+        ClipboardManager cm = (ClipboardManager) ctx.getSystemService(Context.CLIPBOARD_SERVICE);
+        cm.setPrimaryClip(ClipData.newPlainText("label", value));
+    }
 
     private static int dip2px(Context ctx, int dips) {
         return (int) Math.ceil(dips * ctx.getResources().getDisplayMetrics().density);
