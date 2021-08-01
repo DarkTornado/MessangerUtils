@@ -25,15 +25,19 @@ public class ScriptLayout extends BaseLayout {
     }
 
     public void onOptionsItemSelected(int id) {
+        String src, result;
         switch (id) {
             case 0:
-                String src = editor.getText().toString();
-                String result = Utils.rootSave(ctx, "response.js", src);
+                src = editor.getText().toString();
+                result = Utils.rootSave(ctx, "response.js", src);
                 if (result == null) toast("저장되었어요.");
                 else toast("저장되지 않았어요.\n오류: " + result);
                 break;
             case 1:
-
+                src = Utils.rootRead(ctx, "response.js");
+                result = NotiListener.loadScript(src);
+                if (result == null) toast("리로드 완료");
+                else toast("리로드 실패\n오류: " + result);
                 break;
         }
     }

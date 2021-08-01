@@ -27,6 +27,7 @@ public class NotiListener extends NotificationListenerService {
 
     private HashMap<String, String> preChat = new HashMap<>();
     private HashMap<String, Replier> session = new HashMap<>();
+    public static ScriptableObject scope;
 
     @Override
     public void onNotificationPosted(final StatusBarNotification sbn) {
@@ -81,7 +82,9 @@ public class NotiListener extends NotificationListenerService {
 
         /* 자바스크립트 */
         if (Utils.rootLoad(this, "on1", true)) {
-		
+            Object[] args = {room, msg, sender, isGroupChat, replier, imageDB};
+            String result = callScriptMethod("response", args);
+            if (result != null) toast(result);
         }
 
         /* 채팅 기록 */
@@ -119,6 +122,45 @@ public class NotiListener extends NotificationListenerService {
         }
         return roomType == 2;
     }
+
+    public static String callScriptMethod(final String event, final Object[] args) {
+        if (scope == null) return "Scope is not prepared.";
+        org.mozilla.javascript.Context rhino = org.mozilla.javascript.Context.enter();
+        rhino.setOptimizationLevel(-1);
+        rhino.setLanguageVersion(org.mozilla.javascript.Context.VERSION_ES6);
+        rhino.setWrapFactory(new PrimitiveWrapFactory());
+        try {
+            Function func = (Function) scope.get(event, scope);
+            func.call(rhino, scope, scope, args);
+        } catch (ClassCastException e) {
+//            toast("이벤트 리스너(" + event + ") 호출 실패\n" + e.toString());
+        } catch (Exception e) {
+            org.mozilla.javascript.Context.exit();
+            return "이벤트 리스너(" + event + ") 호출 실패\n" + e.toString();
+        }
+        org.mozilla.javascript.Context.exit();
+        return null;
+    }
+
+    public static String loadScript(String source) {
+        try {
+            callScriptMethod("onStartCompile", new Object[0]);
+            org.mozilla.javascript.Context rhino = org.mozilla.javascript.Context.enter();
+            rhino.setOptimizationLevel(-1);
+            rhino.setLanguageVersion(org.mozilla.javascript.Context.VERSION_ES6);
+            rhino.setWrapFactory(new PrimitiveWrapFactory());
+            scope = new ImporterTopLevel(rhino);
+//            ScriptableObject.defineClass(scope, Api.class);
+//            rhino.evaluateString(scope, getJsApi(ctx), "JavaScript", 1, null);
+            rhino.evaluateString(scope, source, "JavaScript", 1, null);
+            org.mozilla.javascript.Context.exit();
+            return null;
+        } catch (Exception e) {
+            org.mozilla.javascript.Context.exit();
+            return e.toString();
+        }
+    }
+
 
     /*
     이미지 수신 테스트용 소스 코드
