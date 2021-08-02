@@ -304,7 +304,7 @@ public class SettingsLayout extends BaseLayout {
             LinearLayout layout = new LinearLayout(ctx);
             layout.setOrientation(1);
             final EditText txt = new EditText(ctx);
-//            txt.setText(Utils.getPackage(ctx));
+            txt.setText(Utils.getPackage(ctx));
             txt.setSingleLine(true);
             layout.addView(txt);
             int pad = dip2px(10);

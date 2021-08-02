@@ -27,12 +27,21 @@ public class NotiListener extends NotificationListenerService {
 
     private HashMap<String, String> preChat = new HashMap<>();
     private HashMap<String, Replier> session = new HashMap<>();
-    public static ScriptableObject scope;
+
+    public static Context ctx;
+    private static ScriptableObject scope;
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        ctx = getApplicationContext();
+    }
 
     @Override
     public void onNotificationPosted(final StatusBarNotification sbn) {
         super.onNotificationPosted(sbn);
         if (!Utils.rootLoad(this, "all_on", false)) return;
+        if (!Utils.getPackage(ctx).equals(sbn.getPackageName())) return;
         Notification.WearableExtender wExt = new Notification.WearableExtender(sbn.getNotification());
         for (Notification.Action act : wExt.getActions()) {
             if (act.getRemoteInputs() != null && act.getRemoteInputs().length > 0) {

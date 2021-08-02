@@ -117,6 +117,12 @@ public class Utils {
         cm.setPrimaryClip(ClipData.newPlainText("label", value));
     }
 
+    public static String getPackage(Context ctx) {
+        String data = rootRead(ctx, "packageName");
+        if (data == null) return "com.kakao.talk";
+        return data;
+    }
+
     private static int dip2px(Context ctx, int dips) {
         return (int) Math.ceil(dips * ctx.getResources().getDisplayMetrics().density);
     }
