@@ -6,12 +6,14 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
 
 import com.darktornado.library.PrimitiveWrapFactory;
 import com.darktornado.msgutils.botapi.ImageDB;
 import com.darktornado.msgutils.botapi.Replier;
+import com.darktornado.msgutils.scriptapi.Api;
 
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.ImporterTopLevel;
@@ -19,22 +21,27 @@ import org.mozilla.javascript.ScriptableObject;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.HashMap;
 
 public class NotiListener extends NotificationListenerService {
 
     private HashMap<String, String> preChat = new HashMap<>();
-    private HashMap<String, Replier> session = new HashMap<>();
 
     public static Context ctx;
-    private static ScriptableObject scope;
+    public static HashMap<String, Replier> session = new HashMap<>();
+    public static ScriptableObject scope;
+    private static Handler handler;
+    private static String jsApi = null;
 
     @Override
     public void onCreate() {
         super.onCreate();
         ctx = getApplicationContext();
+        handler = new Handler();
+    }
+
+    public static void runOnUiThread(Runnable runnable) {
+        handler.post(runnable);
     }
 
     @Override
@@ -159,8 +166,9 @@ public class NotiListener extends NotificationListenerService {
             rhino.setLanguageVersion(org.mozilla.javascript.Context.VERSION_ES6);
             rhino.setWrapFactory(new PrimitiveWrapFactory());
             scope = new ImporterTopLevel(rhino);
-//            ScriptableObject.defineClass(scope, Api.class);
-//            rhino.evaluateString(scope, getJsApi(ctx), "JavaScript", 1, null);
+            ScriptableObject.defineClass(scope, Api.class);
+            ScriptableObject.defineClass(scope, com.darktornado.msgutils.scriptapi.Utils.class);
+            rhino.evaluateString(scope, loadJSApi(ctx), "JavaScript", 1, null);
             rhino.evaluateString(scope, source, "JavaScript", 1, null);
             org.mozilla.javascript.Context.exit();
             return null;
@@ -169,6 +177,18 @@ public class NotiListener extends NotificationListenerService {
             return e.toString();
         }
     }
+
+    private static String loadJSApi(Context ctx) {
+        try {
+            if (jsApi != null) return jsApi;
+            jsApi = Utils.readStream(ctx.getAssets().open("JavascriptApi.js"));
+            return jsApi;
+        }catch (Exception e) {
+//            toast("Cannot load Javascript API.\n" + e.toString());
+        }
+        return "";
+    }
+
 
 
     /*

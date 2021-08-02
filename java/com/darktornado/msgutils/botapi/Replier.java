@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.darktornado.msgutils.NotiListener;
+
 public class Replier {
 
     private Context ctx;
@@ -34,7 +36,10 @@ public class Replier {
     }
 
     public boolean reply(String room, String msg) {
-        return false;
+        Replier replier = NotiListener.session.get(room);
+        if (replier == null) return false;
+        replier.reply(msg);
+        return true;
     }
 
     public boolean markAsRead() {

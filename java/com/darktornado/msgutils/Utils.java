@@ -17,6 +17,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 
 public class Utils {
@@ -78,21 +79,31 @@ public class Utils {
         }
     }
 
-    public static String readFile(String path) {
+    public static String readStream(InputStream stream) {
         try {
-            File file = new File(path);
-            if (!file.exists()) return null;
-            FileInputStream fis = new FileInputStream(file);
-            InputStreamReader isr = new InputStreamReader(fis);
+            InputStreamReader isr = new InputStreamReader(stream);
             BufferedReader br = new BufferedReader(isr);
             String str = br.readLine();
             String line = "";
             while ((line = br.readLine()) != null) {
                 str += "\n" + line;
             }
-            fis.close();
             isr.close();
             br.close();
+            return str;
+        } catch (Exception e) {
+            //toast(e.toString());
+        }
+        return null;
+    }
+
+    public static String readFile(String path) {
+        try {
+            File file = new File(path);
+            if (!file.exists()) return null;
+            FileInputStream fis = new FileInputStream(file);
+            String str = readStream(fis);
+            fis.close();
             return str;
         } catch (Exception e) {
             //toast(e.toString());
