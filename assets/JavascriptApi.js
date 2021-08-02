@@ -18,7 +18,7 @@ function require(moduleName) {
             print(moduleName + "(이)라는 모듈을 찾을 수 없습니다.");
             return null;
         }
-        var src = com.darktornado.nusty.Nusty.readFile(path);
+        var src = com.darktornado.msgutils.Utils.readFile(path);
         if (src == null) {
             print(moduleName + "(이)라는 모듈을 읽을 수 없습니다.");
             return null;
