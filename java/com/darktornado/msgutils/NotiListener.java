@@ -98,9 +98,11 @@ public class NotiListener extends NotificationListenerService {
 
         /* 자바스크립트 */
         if (Utils.rootLoad(this, "on1", true)) {
-            Object[] args = {room, msg, sender, isGroupChat, replier, imageDB};
-            String result = callScriptMethod("response", args);
-            if (result != null) toast(result);
+            final Object[] args = {room, msg, sender, isGroupChat, replier, imageDB};
+            new Thread(() -> {
+                String result = callScriptMethod("response", args);
+                if (result != null) toast(result);
+            }).start();
         }
 
         /* 채팅 기록 */
