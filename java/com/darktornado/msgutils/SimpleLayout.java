@@ -50,7 +50,7 @@ public class SimpleLayout extends BaseLayout {
 
     public void updateOptionsMenu(Menu menu){
         menu.clear();
-        menu.add(0, 0, 0, "추가").setIcon(R.drawable.add).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);;
+        menu.add(0, 0, 0, "추가").setIcon(R.drawable.add).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
         menu.add(0, 1, 0, "모두 삭제");
     }
 
