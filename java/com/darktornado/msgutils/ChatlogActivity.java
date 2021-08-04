@@ -2,14 +2,18 @@ package com.darktornado.msgutils;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebView;
@@ -26,6 +30,9 @@ import com.darktornado.listview.ListAdapter;
 import com.darktornado.msgutils.scriptapi.Api;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 
 public class ChatlogActivity extends Activity {
@@ -100,6 +107,9 @@ public class ChatlogActivity extends Activity {
     }
 
     private void chatInfo(final ChatData data) {
+        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+        dialog.setTitle("채팅 정보 보기");
+
         StringBuilder result = new StringBuilder();
         result.append("<meta name='viewport' content='user-scalable=no width=device-width' />");
         result.append("<style>td{padding:5px;border-bottom: 1px solid #000000;}td.left{padding:5px;border-right: 1px solid #000000;}table{border-top: 1px solid #000000;border-collapse: collapse;}</style>");
@@ -110,7 +120,10 @@ public class ChatlogActivity extends Activity {
         result.append("<tr align=center><td class=left><b>시간</b></td><td>" + data.time + "</td></tr>");
         switch (data.type) {
             case SQLManager.TYPE_IMAGE:
-                result.append("<tr align=center><td class=left><b>사진</b></td><td><img width=100% src='" + new File(SQLManager.PATH + "images/" + data.id + ".jpg").toURI().toString() + "'/></td></tr>");
+                result.append("<tr align=center><td class=left><b>사진</b></td><td><img width=100% src='" + new File(SQLManager.PATH + "images/" + data.id + ".png").toURI().toString() + "'/></td></tr>");
+                dialog.setNeutralButton("저장", (_dialog, which) -> {
+                    saveImage(data);
+                });
                 break;
         }
         result.append("</table>");
@@ -120,8 +133,6 @@ public class ChatlogActivity extends Activity {
                 "내용 : " + data.msg + "\n" +
                 "시간 : " + data.time;
 
-        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-        dialog.setTitle("대화 정보 보기");
         WebView web = new WebView(this);
         if (Build.VERSION.SDK_INT > 23) {
             web.loadDataWithBaseURL(null, result.toString(), "text/html; charset=UTF-8", null, null);
@@ -135,6 +146,24 @@ public class ChatlogActivity extends Activity {
             toast("클립보드로 복사되었어요.");
         });
         dialog.show();
+    }
+
+    private void saveImage(ChatData data) {
+        try {
+            ContentResolver resolver = getContentResolver();
+            ContentValues value = new ContentValues();
+            value.put(MediaStore.MediaColumns.DISPLAY_NAME, data.id + ".png");
+            value.put(MediaStore.MediaColumns.MIME_TYPE, "image/png");
+            value.put(MediaStore.MediaColumns.RELATIVE_PATH, "DCIM/MsgUtils/");
+            Uri uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, value);
+            OutputStream fos = resolver.openOutputStream(uri);
+            Bitmap bitmap = BitmapFactory.decodeFile(SQLManager.PATH + "images/" + data.id + ".png");
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+            fos.flush();
+            fos.close();
+        } catch (Exception e) {
+            toast("이미지 저장 실패\n" + e.toString());
+        }
     }
 
     private void inputChat() {
