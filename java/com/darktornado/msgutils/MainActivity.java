@@ -14,6 +14,8 @@ import android.widget.Toolbar;
 
 import com.darktornado.library.BottomNavigationLayout;
 
+import java.io.File;
+
 public class MainActivity extends Activity {
 
     private Toolbar toolbar;
@@ -115,6 +117,8 @@ public class MainActivity extends Activity {
         layout0.addView(layout);
         layout0.setBackgroundColor(Color.WHITE);
         setContentView(layout0);
+
+        new File(SQLManager.PATH+"profile/").mkdirs();
     }
 
 }

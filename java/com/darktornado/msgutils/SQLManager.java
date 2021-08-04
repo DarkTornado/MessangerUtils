@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
 import android.text.format.DateFormat;
@@ -21,6 +22,7 @@ public class SQLManager extends SQLiteOpenHelper {
     public static final int TYPE_IMAGE = 1;
 
     private final String SENDER = "sender";
+    private final String PROFILE = "profile";
     private final String MSG = "msg";
     private final String ID = "chat_log_id";
     private final String TIME = "time";
@@ -34,7 +36,7 @@ public class SQLManager extends SQLiteOpenHelper {
         if (tableName == null) return;
         tableName = "'" + tableName.replace("'", "''") + "'";  //띄어쓰기 대응
         this.tableName = tableName;
-        getReadableDatabase().execSQL("CREATE TABLE IF NOT EXISTS " + tableName + " (" + ID + " INTEGER," + SENDER + " TEXT," + MSG + " TEXT," + TIME + " TEXT," + TYPE + " INTEGER," + MISC + " TEXT)");
+        getReadableDatabase().execSQL("CREATE TABLE IF NOT EXISTS " + tableName + " (" + ID + " INTEGER," + PROFILE + " INTEGER," + SENDER + " TEXT," + MSG + " TEXT," + TIME + " TEXT," + TYPE + " INTEGER," + MISC + " TEXT)");
     }
 
     @Override
@@ -56,11 +58,12 @@ public class SQLManager extends SQLiteOpenHelper {
         return list.toArray(new String[0]);
     }
 
-    public void insert(long chatId, String sender, String msg, int type) {
+    public void insert(long chatId, String sender, int profile, String msg, int type) {
         SQLiteDatabase db = getReadableDatabase();
         ContentValues values = new ContentValues();
         values.put(ID, chatId);
         values.put(SENDER, sender);
+        values.put(PROFILE, profile);
         values.put(MSG, msg);
         values.put(TYPE, type);
         values.put(MISC, "");
@@ -80,16 +83,10 @@ public class SQLManager extends SQLiteOpenHelper {
             String sender = cursor.getString(cursor.getColumnIndexOrThrow(SENDER));
             String msg = cursor.getString(cursor.getColumnIndexOrThrow(MSG));
             String time = cursor.getString(cursor.getColumnIndexOrThrow(TIME));
+            int profile = cursor.getInt(cursor.getColumnIndexOrThrow(PROFILE));
             int type = cursor.getInt(cursor.getColumnIndexOrThrow(TYPE));
-            switch (type) {
-                case TYPE_MSG:
-                    list.add(new ChatData(tableName, msg, sender, time, null));
-                    break;
-                case TYPE_IMAGE:
-                    long id = cursor.getLong(cursor.getColumnIndexOrThrow(ID));
-                    list.add(new ChatData(tableName, msg, sender, time, BitmapFactory.decodeFile(PATH + "images/" + id + ".jpg")));
-                    break;
-            }
+            long id = cursor.getLong(cursor.getColumnIndexOrThrow(ID));
+            list.add(new ChatData(tableName, msg, sender, profile, time, type, id));
         }
         cursor.close();
         return list.toArray(new ChatData[0]);

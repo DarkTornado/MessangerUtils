@@ -7,14 +7,18 @@ public class ChatData {
     String msg;
     String sender;
     String time;
-    Bitmap image;
+    int profile;
+    int type;
+    long id;
 
-    public ChatData(String room, String msg, String sender, String time, Bitmap image) {
+    public ChatData(String room, String msg, String sender, int profile, String time, int type, long id) {
         this.room = room;
         this.msg = msg;
         this.sender = sender;
         this.time = time;
-        this.image = image;
+        this.profile = profile;
+        this.type = type;
+        this.id = id;
     }
 
     @Override

@@ -109,14 +109,20 @@ public class NotiListener extends NotificationListenerService {
         if (Utils.rootLoad(this, "on2", true)) {
             if (!roomCheck(room, 2)) return;
             try {
+                int profile = imageDB.getProfileHash();
                 SQLManager sql = new SQLManager(this, room);
                 if (imageDB.getImage() == null) {
-                    sql.insert(chatLogId, sender, msg, SQLManager.TYPE_MSG);
+                    sql.insert(chatLogId, sender, profile, msg, SQLManager.TYPE_MSG);
                 } else {
-                    sql.insert(chatLogId, sender, msg, SQLManager.TYPE_IMAGE);
+                    sql.insert(chatLogId, sender, profile, msg, SQLManager.TYPE_IMAGE);
                     File file = new File(SQLManager.PATH + "images/" + chatLogId + ".jpg");
                     FileOutputStream fos = new FileOutputStream(file);
                     imageDB.getImageBitmap().compress(Bitmap.CompressFormat.JPEG, 90, fos);
+                }
+                File file = new File(SQLManager.PATH + "profiles/" + profile + ".png");
+                if (!file.exists()) {
+                    FileOutputStream fos = new FileOutputStream(file);
+                    imageDB.getProfileBitmap().compress(Bitmap.CompressFormat.PNG, 100, fos);
                 }
             } catch (Exception e) {
                 toast("채팅 기록 저장 실패\n" + e.toString());
