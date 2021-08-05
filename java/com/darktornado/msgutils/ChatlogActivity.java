@@ -42,15 +42,26 @@ public class ChatlogActivity extends Activity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        SQLManager sql;
         switch (item.getItemId()) {
             case 0:
                 Api.markAsRad(room);
+                toast("읽음처리 되었어요.");
                 break;
             case 1:
                 inputChat();
                 break;
             case 2:
-
+                sql = new SQLManager(this, room);
+                sql.deleteAll();
+                recreate();
+                toast("메신저 도구에 저장된 대화 내용이 삭제되었어요.");
+                break;
+            case 3:
+                sql = new SQLManager(this, room);
+                sql.deleteAll();
+                finish();
+                toast("메신저 도구에 저장된 해당 채팅방 관련 정보가 삭제되었어요.");
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -61,6 +72,7 @@ public class ChatlogActivity extends Activity {
         menu.add(0, 0, 0, "읽음처리");
         menu.add(0, 1, 0, "응답 전송");
         menu.add(0, 2, 0, "대화 내용 삭제");
+        menu.add(0, 3, 0, "채팅방 삭제");
         return true;
     }
 
