@@ -45,8 +45,8 @@ public class ChatlogActivity extends Activity {
         SQLManager sql;
         switch (item.getItemId()) {
             case 0:
-                Api.markAsRad(room);
-                toast("읽음처리 되었어요.");
+                if (Api.markAsRad(room)) toast("읽음처리 되었어요.");
+                else toast("읽음처리를 하지 못했어요.");
                 break;
             case 1:
                 inputChat();
@@ -201,7 +201,8 @@ public class ChatlogActivity extends Activity {
         dialog.setNegativeButton("취소", null);
         dialog.setPositiveButton("확인", (_dialog, which) -> {
             String msg = txt.getText().toString();
-            Api.replyRoom(room, msg);
+            if (Api.replyRoom(room, msg)) toast("응답을 보냈어요.");
+            else toast("응답을 보내지 못했어요.");
         });
         dialog.show();
     }
