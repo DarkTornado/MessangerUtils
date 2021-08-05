@@ -162,17 +162,24 @@ public class ChatlogActivity extends Activity {
 
     private void saveImage(ChatData data) {
         try {
-            ContentResolver resolver = getContentResolver();
-            ContentValues value = new ContentValues();
-            value.put(MediaStore.MediaColumns.DISPLAY_NAME, data.id + ".png");
-            value.put(MediaStore.MediaColumns.MIME_TYPE, "image/png");
-            value.put(MediaStore.MediaColumns.RELATIVE_PATH, "DCIM/MsgUtils/");
-            Uri uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, value);
-            OutputStream fos = resolver.openOutputStream(uri);
+            OutputStream fos;
+            if (Build.VERSION.SDK_INT >= 30) {
+                ContentResolver resolver = getContentResolver();
+                ContentValues value = new ContentValues();
+                value.put(MediaStore.MediaColumns.DISPLAY_NAME, data.id + ".png");
+                value.put(MediaStore.MediaColumns.MIME_TYPE, "image/png");
+                value.put(MediaStore.MediaColumns.RELATIVE_PATH, "DCIM/MsgUtils/");
+                Uri uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, value);
+                fos = resolver.openOutputStream(uri);
+            } else {
+                File file = new File(SQLManager.sdcard + "/DCIM/MsgUtils/", data.id + ".png");
+                fos = new FileOutputStream(file);
+            }
             Bitmap bitmap = BitmapFactory.decodeFile(SQLManager.PATH + "images/" + data.id + ".png");
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
             fos.flush();
             fos.close();
+            toast("/내장메모리/DCIM/MsgUtils/ 폴더에 저장되었어요.");
         } catch (Exception e) {
             toast("이미지 저장 실패\n" + e.toString());
         }
