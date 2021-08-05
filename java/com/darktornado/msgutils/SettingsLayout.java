@@ -261,7 +261,7 @@ public class SettingsLayout extends BaseLayout {
                             toast("Play 스토어로 이동합니다.");
                             break;
                         case 2:
-//                                NotiListener.sessions.clear();
+                            NotiListener.session.clear();
                             toast("봇이 작동하면서 저장된 세션들이 초기화되었습니다.");
                             break;
                         case 3:
@@ -325,32 +325,28 @@ public class SettingsLayout extends BaseLayout {
     }
 
     private void inputRooms(int type) {
-        try {
-            AlertDialog.Builder dialog = new AlertDialog.Builder(ctx);
-            dialog.setTitle("방 이름 입력");
-            LinearLayout layout = new LinearLayout(ctx);
-            layout.setOrientation(1);
-            final EditText txt = new EditText(ctx);
-            String list = Utils.rootRead(ctx, "roomList" + type);
-            if (list != null) txt.setText(list);
-            txt.setHint("방 이름 입력...");
-            txt.setOnClickListener(view -> toast("방 이름 구분은 엔터입니다..."));
-            layout.addView(txt);
-            int pad = dip2px(10);
-            layout.setPadding(pad, pad, pad, pad);
-            ScrollView scroll = new ScrollView(ctx);
-            scroll.addView(layout);
-            dialog.setView(scroll);
-            dialog.setNegativeButton("취소", null);
-            dialog.setPositiveButton("확인", (dialog1, which) -> {
-                String input = txt.getText().toString();
-                Utils.rootSave(ctx, "roomList" + type, input);
-                toast("저장되었습니다.");
-            });
-            dialog.show();
-        } catch (Exception e) {
-            toast(e.toString());
-        }
+        AlertDialog.Builder dialog = new AlertDialog.Builder(ctx);
+        dialog.setTitle("방 이름 입력");
+        LinearLayout layout = new LinearLayout(ctx);
+        layout.setOrientation(1);
+        final EditText txt = new EditText(ctx);
+        String list = Utils.rootRead(ctx, "roomList" + type);
+        if (list != null) txt.setText(list);
+        txt.setHint("방 이름 입력...");
+        txt.setOnClickListener(view -> toast("방 이름 구분은 엔터입니다..."));
+        layout.addView(txt);
+        int pad = dip2px(10);
+        layout.setPadding(pad, pad, pad, pad);
+        ScrollView scroll = new ScrollView(ctx);
+        scroll.addView(layout);
+        dialog.setView(scroll);
+        dialog.setNegativeButton("취소", null);
+        dialog.setPositiveButton("확인", (dialog1, which) -> {
+            String input = txt.getText().toString();
+            Utils.rootSave(ctx, "roomList" + type, input);
+            toast("저장되었습니다.");
+        });
+        dialog.show();
     }
 
 }
