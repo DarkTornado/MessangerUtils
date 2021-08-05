@@ -298,30 +298,26 @@ public class SettingsLayout extends BaseLayout {
     }
 
     private void inputPackageName() {
-        try {
-            AlertDialog.Builder dialog = new AlertDialog.Builder(ctx);
-            dialog.setTitle("패키지명 입력");
-            LinearLayout layout = new LinearLayout(ctx);
-            layout.setOrientation(1);
-            final EditText txt = new EditText(ctx);
-            txt.setText(Utils.getPackage(ctx));
-            txt.setSingleLine(true);
-            layout.addView(txt);
-            int pad = dip2px(10);
-            layout.setPadding(pad, pad, pad, pad);
-            ScrollView scroll = new ScrollView(ctx);
-            scroll.addView(layout);
-            dialog.setView(scroll);
-            dialog.setNegativeButton("취소", null);
-            dialog.setPositiveButton("확인", (dialog1, which) -> {
-                String input = txt.getText().toString();
-                Utils.rootSave(ctx, "packageName", input);
-                toast("저장되었습니다.");
-            });
-            dialog.show();
-        } catch (Exception e) {
-            toast(e.toString());
-        }
+        AlertDialog.Builder dialog = new AlertDialog.Builder(ctx);
+        dialog.setTitle("패키지명 입력");
+        LinearLayout layout = new LinearLayout(ctx);
+        layout.setOrientation(1);
+        final EditText txt = new EditText(ctx);
+        txt.setText(Utils.getPackage(ctx));
+        txt.setSingleLine(true);
+        layout.addView(txt);
+        int pad = dip2px(10);
+        layout.setPadding(pad, pad, pad, pad);
+        ScrollView scroll = new ScrollView(ctx);
+        scroll.addView(layout);
+        dialog.setView(scroll);
+        dialog.setNegativeButton("취소", null);
+        dialog.setPositiveButton("확인", (dialog1, which) -> {
+            String input = txt.getText().toString();
+            Utils.rootSave(ctx, "packageName", input);
+            toast("저장되었습니다.");
+        });
+        dialog.show();
     }
 
     private void inputRooms(int type) {
