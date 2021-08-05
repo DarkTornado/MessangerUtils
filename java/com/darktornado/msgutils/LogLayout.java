@@ -10,6 +10,8 @@ import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -24,8 +26,8 @@ public class LogLayout extends BaseLayout {
 
     public LinearLayout view;
 
-    public void onOptionsItemSelected(int id){
-        switch (id){
+    public void onOptionsItemSelected(int id) {
+        switch (id) {
             case 0:
                 view.removeAllViews();
                 init();
@@ -33,7 +35,7 @@ public class LogLayout extends BaseLayout {
         }
     }
 
-    public void updateOptionsMenu(Menu menu){
+    public void updateOptionsMenu(Menu menu) {
         menu.clear();
         menu.add(0, 0, 0, "새로 고침").setIcon(R.drawable.reload).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
     }
@@ -69,7 +71,19 @@ public class LogLayout extends BaseLayout {
                         break;
                     }
                 }
-                chatDialog2(rooms[index]);
+                openChatRoom(rooms[index]);
+            });
+            list.setOnItemLongClickListener((parent, view, pos, id) -> {
+                int index = 0;
+                String text = ((TextView) view).getText().toString();
+                for (int n = 0; n < rooms.length; n++) {
+                    if (text.equals(rooms[n])) {
+                        index = n;
+                        break;
+                    }
+                }
+                openMenu(rooms[index]);
+                return true;
             });
             txt.addTextChangedListener(new TextWatcher() {
                 @Override
@@ -105,28 +119,30 @@ public class LogLayout extends BaseLayout {
         }
     }
 
-    private void chatDialog2(final String room) {
+    private void openChatRoom(String room) {
         Intent intent = new Intent(ctx, ChatlogActivity.class);
         intent.putExtra("room", room);
         ctx.startActivity(intent);
     }
 
-    public void removeDialog(String room, String str) {
-        try {
-            AlertDialog.Builder dialog = new AlertDialog.Builder(ctx);
-            dialog.setTitle("채팅 로그 삭제");
-            dialog.setMessage(str + room + "에서 기록된 채팅 로그를 삭제하시겠습니까?");
-            dialog.setNegativeButton("아니요", null);
-            dialog.setPositiveButton("네", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int which) {
-
-                }
-            });
-            dialog.show();
-        } catch (Exception e) {
-            toast(e.toString());
-        }
+    private void openMenu(final String room) {
+        AlertDialog.Builder dialog = new AlertDialog.Builder(ctx);
+        dialog.setTitle(room);
+        String[] menus = {"채팅 기록 보기", "채팅방 삭제"};
+        dialog.setItems(menus, (dialog1, which) -> {
+            SQLManager sql;
+            switch (which) {
+                case 0:
+                    openChatRoom(room);
+                    break;
+                case 1:
+                    sql = new SQLManager(ctx, room);
+                    sql.deleteAll();
+                    break;
+            }
+        });
+        dialog.setNegativeButton("취소", null);
+        dialog.show();
     }
 
 }
