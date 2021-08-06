@@ -187,6 +187,43 @@ public class SettingsLayout extends BaseLayout {
         });
         layout.addView(radios);
 
+        String[] menus = {"프로필 사진 삭제", "사진 파일 삭제"};
+        Button[] btns = new Button[menus.length];
+        LinearLayout.LayoutParams margin = new LinearLayout.LayoutParams(-1, -2, 1);
+        int mar = dip2px(1);
+        margin.setMargins(mar, mar, mar, mar);
+        LinearLayout[] lays = new LinearLayout[(menus.length / 2)];
+        for (int n = 0; n < menus.length; n++) {
+            if (n % 2 == 0) {
+                lays[n / 2] = new LinearLayout(ctx);
+                lays[n / 2].setOrientation(0);
+                lays[n / 2].setWeightSum(2);
+                layout.addView(lays[n / 2]);
+            }
+            btns[n] = new Button(ctx);
+            btns[n].setText(menus[n]);
+            btns[n].setId(n);
+            btns[n].setTransformationMethod(null);
+            btns[n].setLayoutParams(margin);
+            btns[n].setBackgroundColor(Color.parseColor("#FCE4EC"));
+            btns[n].setOnClickListener(v -> {
+                try {
+                    switch (v.getId()) {
+                        case 0:
+
+                            break;
+                        case 1:
+
+                            break;
+                    }
+                } catch (Exception e) {
+                    toast(e.toString());
+                }
+            });
+            lays[n / 2].addView(btns[n]);
+        }
+
+
         int pad = dip2px(20);
         layout.setPadding(pad, pad, pad, pad);
         layout0.addView(layout);
