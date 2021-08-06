@@ -108,6 +108,7 @@ public class ChatlogActivity extends Activity {
         list.setOnItemClickListener((parent, view, pos, id) -> {
             chatInfo(data[pos]);
         });
+        list.setSelection(adapter.getCount() - 1);
         layout.addView(list);
 
         int pad = dip2px(16);
