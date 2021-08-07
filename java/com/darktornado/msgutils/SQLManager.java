@@ -45,7 +45,6 @@ public class SQLManager extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
-
     }
 
     public String[] getAllTables() {
