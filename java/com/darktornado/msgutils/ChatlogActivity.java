@@ -4,8 +4,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -21,7 +19,6 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ScrollView;
-import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.Toolbar;
 
@@ -31,7 +28,6 @@ import com.darktornado.msgutils.scriptapi.Api;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 
@@ -94,7 +90,7 @@ public class ChatlogActivity extends Activity {
 
         final ArrayList<Item> items = new ArrayList<>();
         for (ChatData datum : data) {
-            Bitmap profile = BitmapFactory.decodeFile(SQLManager.PATH + "/profiles/" + datum.profile + ".png");
+            Bitmap profile = BitmapFactory.decodeFile(SQLManager.PATH + "/profiles/" + room + "/" + datum.profile + ".png");
             items.add(new Item(datum.sender, datum.msg, new BitmapDrawable(profile)));
         }
 
@@ -133,7 +129,7 @@ public class ChatlogActivity extends Activity {
         result.append("<tr align=center><td class=left><b>시간</b></td><td>" + data.time + "</td></tr>");
         switch (data.type) {
             case SQLManager.TYPE_IMAGE:
-                result.append("<tr align=center><td class=left><b>사진</b></td><td><img width=100% src='" + new File(SQLManager.PATH + "images/" + data.id + ".png").toURI().toString() + "'/></td></tr>");
+                result.append("<tr align=center><td class=left><b>사진</b></td><td><img width=100% src='" + new File(SQLManager.PATH + "images/" + room + "/" + data.id + ".png").toURI().toString() + "'/></td></tr>");
                 dialog.setNeutralButton("저장", (_dialog, which) -> {
                     saveImage(data);
                 });
