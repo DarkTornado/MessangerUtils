@@ -115,11 +115,15 @@ public class NotiListener extends NotificationListenerService {
                     sql.insert(chatLogId, sender, profile, msg, SQLManager.TYPE_MSG);
                 } else {
                     sql.insert(chatLogId, sender, profile, msg, SQLManager.TYPE_IMAGE);
-                    File file = new File(SQLManager.PATH + "images/" + chatLogId + ".png");
+                    File dir = new File(SQLManager.PATH + "images/" + room + "/");
+                    dir.mkdirs();
+                    File file = new File(dir, chatLogId + ".png");
                     FileOutputStream fos = new FileOutputStream(file);
                     imageDB.getImageBitmap().compress(Bitmap.CompressFormat.PNG, 100, fos);
                 }
-                File file = new File(SQLManager.PATH + "profiles/" + profile + ".png");
+                File dir = new File(SQLManager.PATH + "profiles/" + room + "/");
+                dir.mkdirs();
+                File file = new File(dir, profile + ".png");
                 if (!file.exists()) {
                     FileOutputStream fos = new FileOutputStream(file);
                     imageDB.getProfileBitmap().compress(Bitmap.CompressFormat.PNG, 100, fos);
