@@ -10,6 +10,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.RippleDrawable;
 import android.os.Build;
+import android.util.Base64;
 import android.widget.LinearLayout;
 import android.widget.Toolbar;
 
@@ -19,6 +20,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 
 public class Utils {
     public static final int TYPE_SIMPLE = 1;
@@ -132,6 +134,11 @@ public class Utils {
         String data = rootRead(ctx, "packageName");
         if (data == null) return "com.kakao.talk";
         return data;
+    }
+
+    public static String encode(String room) {
+        byte[] data = room.getBytes(StandardCharsets.UTF_8);
+        return Base64.encodeToString(data, Base64.NO_WRAP);
     }
 
     private static int dip2px(Context ctx, int dips) {

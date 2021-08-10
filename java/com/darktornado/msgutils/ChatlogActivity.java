@@ -90,7 +90,7 @@ public class ChatlogActivity extends Activity {
 
         final ArrayList<Item> items = new ArrayList<>();
         for (ChatData datum : data) {
-            Bitmap profile = BitmapFactory.decodeFile(SQLManager.PATH + "/profiles/" + room + "/" + datum.profile + ".png");
+            Bitmap profile = BitmapFactory.decodeFile(SQLManager.PATH + "/profiles/" + Utils.encode(room) + "/" + datum.profile + ".png");
             items.add(new Item(datum.sender, datum.msg, new BitmapDrawable(profile)));
         }
 
@@ -129,7 +129,7 @@ public class ChatlogActivity extends Activity {
         result.append("<tr align=center><td class=left><b>시간</b></td><td>" + data.time + "</td></tr>");
         switch (data.type) {
             case SQLManager.TYPE_IMAGE:
-                result.append("<tr align=center><td class=left><b>사진</b></td><td><img width=100% src='" + new File(SQLManager.PATH + "images/" + room + "/" + data.id + ".png").toURI().toString() + "'/></td></tr>");
+                result.append("<tr align=center><td class=left><b>사진</b></td><td><img width=100% src='" + new File(SQLManager.PATH + "images/" + Utils.encode(room) + "/" + data.id + ".png").toURI().toString() + "'/></td></tr>");
                 dialog.setNeutralButton("저장", (_dialog, which) -> {
                     saveImage(data);
                 });
