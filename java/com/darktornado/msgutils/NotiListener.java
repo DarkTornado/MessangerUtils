@@ -129,7 +129,11 @@ public class NotiListener extends NotificationListenerService {
                     imageDB.getProfileBitmap().compress(Bitmap.CompressFormat.PNG, 100, fos);
                 }
             } catch (Exception e) {
-                toast("채팅 기록 저장 실패\n" + e.toString());
+                toast("채팅 기록 저장 실패\n" +
+                        "room: " + room + "\n" +
+                        "msg: " + msg + "\n" +
+                        "sender: " + sender + "\n" +
+                        "오류: " + e.toString());
             }
         }
 
