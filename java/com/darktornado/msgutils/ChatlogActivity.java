@@ -38,7 +38,6 @@ public class ChatlogActivity extends Activity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        SQLManager sql;
         switch (item.getItemId()) {
             case 0:
                 if (Api.markAsRad(room)) toast("읽음처리 되었어요.");
@@ -47,18 +46,8 @@ public class ChatlogActivity extends Activity {
             case 1:
                 inputChat();
                 break;
-            case 2:
-                sql = new SQLManager(this, room);
-                sql.deleteAll();
-                recreate();
-                toast("메신저 도구에 저장된 대화 내용이 삭제되었어요.");
-                break;
-            case 3:
-                sql = new SQLManager(this, room);
-                sql.deleteAll();
-                finish();
-                toast("메신저 도구에 저장된 해당 채팅방 관련 정보가 삭제되었어요.");
-                break;
+            default:
+                deleteDialog(item.getTitle().toString(), item.getItemId());
         }
         return super.onOptionsItemSelected(item);
     }
@@ -67,8 +56,10 @@ public class ChatlogActivity extends Activity {
     public boolean onCreateOptionsMenu(Menu menu) {
         menu.add(0, 0, 0, "읽음처리");
         menu.add(0, 1, 0, "응답 전송");
-        menu.add(0, 2, 0, "대화 내용 삭제");
-        menu.add(0, 3, 0, "채팅방 삭제");
+        menu.add(0, 2, 0, "프로필 사진 삭제");
+        menu.add(0, 3, 0, "사진 파일 삭제");
+        menu.add(0, 4, 0, "대화 내용 삭제");
+        menu.add(0, 5, 0, "채팅방 삭제");
         return true;
     }
 
@@ -180,6 +171,55 @@ public class ChatlogActivity extends Activity {
         } catch (Exception e) {
             toast("이미지 저장 실패\n" + e.toString());
         }
+    }
+
+    private void deleteDialog(String title, int type) {
+        final String[] msgs = new String[6];
+        msgs[2] = " 대화 기록을 저장할 때 해당 채팅방 참여자들의 프로필 사진이 저장돼요. 저장된 프로필 사진들을 삭제하실건가요?\n" +
+                " 삭제해도 대화 내용은 유지되지만, 삭제한 이후에 채팅을 보낸 적이 없는 사람들은 프로필 사진이 뜨지 않아요.\n" +
+                " 여기서 무언가를 지우면 메신저 도구에만 반영되고, 카카오톡에는 반영되지는 않아요.";
+        msgs[3] = " 대화 기록을 저장할 때 해당 채팅방 참여자들이 보낸 사진들도 같이 저장돼요. 저장된 사진들을 삭제하실건가요?\n" +
+                " 삭제해도 대화 내용은 유지되지만, 상대방이 보냈던 사진들은 뜨지 않아요." +
+                " 여기서 무언가를 지우면 메신저 도구에만 반영되고, 카카오톡에는 반영되지는 않아요.";
+        msgs[4] = " 메신저 도구에서 기록된 이 채팅방의 대화 기록을 삭제하실건가요? 메신저 도구에만 반영되고, 카카오톡에는 반영되지는 않아요.";
+        msgs[5] = " 메신저 도구에서 기록된 이 채팅방의 대화 기록을 삭제하고, 채팅방 목록에서 이 채팅방을 삭제하실건가요? 메신저 도구에만 반영되고, 카카오톡에는 반영되지는 않아요.";
+        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+        dialog.setTitle(title);
+        dialog.setMessage(msgs[type]);
+        dialog.setNegativeButton("취소", null);
+        dialog.setPositiveButton("확인", (_dialog, which) -> {
+            SQLManager sql;
+            File[] files;
+            switch (type) {
+                case 2:
+                    files = new File(SQLManager.PATH + "/profiles/" + Utils.encode(room) + "/").listFiles();
+                    for (File file : files) {
+                        file.delete();
+                    }
+                    toast("프로필 사진들이 삭제되었어요.");
+                    break;
+                case 3:
+                    files = new File(SQLManager.PATH + "/images/" + Utils.encode(room) + "/").listFiles();
+                    for (File file : files) {
+                        file.delete();
+                    }
+                    toast("저장된 사진들이 삭제되었어요.");
+                    break;
+                case 4:
+                    sql = new SQLManager(this, room);
+                    sql.deleteAll();
+                    recreate();
+                    toast("메신저 도구에 저장된 대화 내용이 삭제되었어요.");
+                    break;
+                case 5:
+                    sql = new SQLManager(this, room);
+                    sql.deleteAll();
+                    finish();
+                    toast("메신저 도구에 저장된 해당 채팅방 관련 정보가 삭제되었어요.");
+                    break;
+            }
+        });
+        dialog.show();
     }
 
     private void inputChat() {
