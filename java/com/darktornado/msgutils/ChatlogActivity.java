@@ -33,7 +33,6 @@ import java.util.ArrayList;
 
 public class ChatlogActivity extends Activity {
 
-    private Toolbar toolbar;
     private String room;
 
     @Override
@@ -70,7 +69,7 @@ public class ChatlogActivity extends Activity {
 
         LinearLayout layout0 = new LinearLayout(this);
         layout0.setOrientation(1);
-        toolbar = Utils.createToolBar(this, room);
+        Toolbar toolbar = Utils.createToolBar(this, room);
         setActionBar(toolbar);
         layout0.addView(toolbar);
         LinearLayout layout = new LinearLayout(this);
