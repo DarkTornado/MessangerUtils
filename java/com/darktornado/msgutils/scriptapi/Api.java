@@ -38,7 +38,7 @@ public class Api extends ScriptableObject {
     }
 
     @JSStaticFunction
-    public static boolean markAsRad(String room){
+    public static boolean markAsRead(String room){
         Replier replier = NotiListener.session.get(room);
         if (replier == null) return false;
         return replier.markAsRead();
