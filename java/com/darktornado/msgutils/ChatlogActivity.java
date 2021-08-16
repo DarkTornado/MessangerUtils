@@ -39,7 +39,7 @@ public class ChatlogActivity extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case 0:
-                if (Api.markAsRad(room)) toast("읽음처리 되었어요.");
+                if (Api.markAsRead(room)) toast("읽음처리 되었어요.");
                 else toast("읽음처리를 하지 못했어요.");
                 break;
             case 1:
