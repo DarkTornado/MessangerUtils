@@ -47,6 +47,9 @@ public class ChatlogActivity extends Activity {
             case 1:
                 inputChat();
                 break;
+            case 2:
+                
+                break;
             default:
                 deleteDialog(item.getTitle().toString(), item.getItemId());
         }
@@ -57,10 +60,11 @@ public class ChatlogActivity extends Activity {
     public boolean onCreateOptionsMenu(Menu menu) {
         menu.add(0, 0, 0, "읽음처리");
         menu.add(0, 1, 0, "응답 전송");
-        menu.add(0, 2, 0, "프로필 사진 삭제");
-        menu.add(0, 3, 0, "사진 파일 삭제");
-        menu.add(0, 4, 0, "대화 내용 삭제");
-        menu.add(0, 5, 0, "채팅방 삭제");
+        menu.add(0, 2, 0, "모두 불러오기");
+        menu.add(0, 3, 0, "프로필 사진 삭제");
+        menu.add(0, 4, 0, "사진 파일 삭제");
+        menu.add(0, 5, 0, "대화 내용 삭제");
+        menu.add(0, 6, 0, "채팅방 삭제");
         return true;
     }
 
