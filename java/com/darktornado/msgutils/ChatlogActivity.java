@@ -35,6 +35,7 @@ import java.util.ArrayList;
 public class ChatlogActivity extends Activity {
 
     private String room;
+    private ListView list;
     private SQLManager sql;
 
     @Override
@@ -48,7 +49,7 @@ public class ChatlogActivity extends Activity {
                 inputChat();
                 break;
             case 2:
-                
+                loadAllLog();
                 break;
             default:
                 deleteDialog(item.getTitle().toString(), item.getItemId());
@@ -91,7 +92,7 @@ public class ChatlogActivity extends Activity {
             items.add(new Item(datum.sender, datum.msg, new BitmapDrawable(profile)));
         }
 
-        final ListView list = new ListView(this);
+        list = new ListView(this);
         list.setFastScrollEnabled(true);
         list.setDivider(null);
         list.setDividerHeight(dip2px(5));
@@ -267,6 +268,24 @@ public class ChatlogActivity extends Activity {
             else toast("응답을 보내지 못했어요.");
         });
         dialog.show();
+    }
+
+    private void loadAllLog() {
+        sql.close();
+        sql = new SQLManager(this, room);
+        final ChatData[] data = sql.getAll();
+        ArrayList<Item> items = new ArrayList<>();
+        for (ChatData datum : data) {
+            Bitmap profile = BitmapFactory.decodeFile(SQLManager.PATH + "/profiles/" + Utils.encode(room) + "/" + datum.profile + ".png");
+            items.add(new Item(datum.sender, datum.msg, new BitmapDrawable(profile)));
+        }
+        final ListAdapter adapter = new ListAdapter();
+        adapter.setItems(items);
+        list.setAdapter(adapter);
+        list.setOnItemClickListener((parent, view, pos, id) -> {
+            chatInfo(data[pos]);
+        });
+        list.setOnScrollListener(null);
     }
 
     @Override
