@@ -118,7 +118,7 @@ public class SQLManager extends SQLiteOpenHelper {
         int profile = cursor.getInt(cursor.getColumnIndexOrThrow(PROFILE));
         int type = cursor.getInt(cursor.getColumnIndexOrThrow(TYPE));
         long id = cursor.getLong(cursor.getColumnIndexOrThrow(ID));
-        return new ChatData(tableName, msg, sender, profile, time, type, id));
+        return new ChatData(tableName, msg, sender, profile, time, type, id);
     }
 
     public void close() {
