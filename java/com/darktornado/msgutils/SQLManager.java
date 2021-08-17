@@ -92,13 +92,12 @@ public class SQLManager extends SQLiteOpenHelper {
         return list.toArray(new ChatData[0]);
     }
 
-    public ChatData[] get300() {
-        ArrayList<ChatData> list = new ArrayList<>();
+    public ArrayList<ChatData> get300() {
         SQLiteDatabase db = getReadableDatabase();
         cursor = db.query(tableName, null, null, null, null, null, null);
         cursor.moveToLast();
-//        while (cursor.moveToPrevious()) {
-        for (int n = 0; n < 100; n++) {
+        ArrayList<ChatData> list = new ArrayList<>();
+        for (int n = 0; n < 300; n++) {
             if (!cursor.moveToPrevious()) break;
             String sender = cursor.getString(cursor.getColumnIndexOrThrow(SENDER));
             String msg = cursor.getString(cursor.getColumnIndexOrThrow(MSG));
@@ -108,8 +107,22 @@ public class SQLManager extends SQLiteOpenHelper {
             long id = cursor.getLong(cursor.getColumnIndexOrThrow(ID));
             list.add(0, new ChatData(tableName, msg, sender, profile, time, type, id));
         }
-        cursor.close();
-        return list.toArray(new ChatData[0]);
+        return list;
+    }
+
+    public ChatData getOne() {
+        if (!cursor.moveToPrevious()) return null;
+        String sender = cursor.getString(cursor.getColumnIndexOrThrow(SENDER));
+        String msg = cursor.getString(cursor.getColumnIndexOrThrow(MSG));
+        String time = cursor.getString(cursor.getColumnIndexOrThrow(TIME));
+        int profile = cursor.getInt(cursor.getColumnIndexOrThrow(PROFILE));
+        int type = cursor.getInt(cursor.getColumnIndexOrThrow(TYPE));
+        long id = cursor.getLong(cursor.getColumnIndexOrThrow(ID));
+        return new ChatData(tableName, msg, sender, profile, time, type, id));
+    }
+
+    public void close() {
+        if (cursor != null) cursor.close();
     }
 
 }

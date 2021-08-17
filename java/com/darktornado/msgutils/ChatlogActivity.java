@@ -15,6 +15,7 @@ import android.provider.MediaStore;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebView;
+import android.widget.AbsListView;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -34,6 +35,7 @@ import java.util.ArrayList;
 public class ChatlogActivity extends Activity {
 
     private String room;
+    private SQLManager sql;
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -75,24 +77,44 @@ public class ChatlogActivity extends Activity {
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(1);
 
-        SQLManager sql = new SQLManager(this, room);
-        final ChatData[] data = sql.get300();
+        sql = new SQLManager(this, room);
+        final ArrayList<ChatData> data = sql.get300();
+        final boolean[] flag = {false};
 
-        final ArrayList<Item> items = new ArrayList<>();
+        ArrayList<Item> items = new ArrayList<>();
         for (ChatData datum : data) {
             Bitmap profile = BitmapFactory.decodeFile(SQLManager.PATH + "/profiles/" + Utils.encode(room) + "/" + datum.profile + ".png");
             items.add(new Item(datum.sender, datum.msg, new BitmapDrawable(profile)));
         }
 
-        ListView list = new ListView(this);
+        final ListView list = new ListView(this);
         list.setFastScrollEnabled(true);
         list.setDivider(null);
         list.setDividerHeight(dip2px(5));
-        ListAdapter adapter = new ListAdapter();
+        final ListAdapter adapter = new ListAdapter();
         adapter.setItems(items);
         list.setAdapter(adapter);
         list.setOnItemClickListener((parent, view, pos, id) -> {
-            chatInfo(data[pos]);
+            chatInfo(data.get(pos));
+        });
+        list.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+                if (flag[0]) return;
+                if (!list.canScrollVertically(-1)) {
+                    flag[0] = true;
+                    ChatData datum = sql.getOne();
+                    if (datum == null) return;
+                    data.add(0, datum);
+                    Bitmap profile = BitmapFactory.decodeFile(SQLManager.PATH + "/profiles/" + Utils.encode(room) + "/" + datum.profile + ".png");
+                    adapter.addItem(new Item(datum.sender, datum.msg, new BitmapDrawable(profile)));
+                }
+                adapter.notifyDataSetChanged();
+                flag[0] = false;
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {}
         });
         list.setSelection(adapter.getCount() - 1);
         layout.addView(list);
@@ -241,6 +263,12 @@ public class ChatlogActivity extends Activity {
             else toast("응답을 보내지 못했어요.");
         });
         dialog.show();
+    }
+
+    @Override
+    public void onDestroy(){
+        sql.close();
+        super.onDestroy();
     }
 
     private void toast(String msg) {
