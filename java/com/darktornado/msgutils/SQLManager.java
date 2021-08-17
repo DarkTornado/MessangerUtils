@@ -30,6 +30,7 @@ public class SQLManager extends SQLiteOpenHelper {
     private final String MISC = "misc";
 
     private String tableName;
+    private Cursor cursor;
 
     public SQLManager(Context context, String tableName) {
         super(context, PATH + "chat_log.db", null, 1);
@@ -86,6 +87,26 @@ public class SQLManager extends SQLiteOpenHelper {
             int type = cursor.getInt(cursor.getColumnIndexOrThrow(TYPE));
             long id = cursor.getLong(cursor.getColumnIndexOrThrow(ID));
             list.add(new ChatData(tableName, msg, sender, profile, time, type, id));
+        }
+        cursor.close();
+        return list.toArray(new ChatData[0]);
+    }
+
+    public ChatData[] get300() {
+        ArrayList<ChatData> list = new ArrayList<>();
+        SQLiteDatabase db = getReadableDatabase();
+        cursor = db.query(tableName, null, null, null, null, null, null);
+        cursor.moveToLast();
+//        while (cursor.moveToPrevious()) {
+        for (int n = 0; n < 100; n++) {
+            if (!cursor.moveToPrevious()) break;
+            String sender = cursor.getString(cursor.getColumnIndexOrThrow(SENDER));
+            String msg = cursor.getString(cursor.getColumnIndexOrThrow(MSG));
+            String time = cursor.getString(cursor.getColumnIndexOrThrow(TIME));
+            int profile = cursor.getInt(cursor.getColumnIndexOrThrow(PROFILE));
+            int type = cursor.getInt(cursor.getColumnIndexOrThrow(TYPE));
+            long id = cursor.getLong(cursor.getColumnIndexOrThrow(ID));
+            list.add(0, new ChatData(tableName, msg, sender, profile, time, type, id));
         }
         cursor.close();
         return list.toArray(new ChatData[0]);

@@ -76,7 +76,7 @@ public class ChatlogActivity extends Activity {
         layout.setOrientation(1);
 
         SQLManager sql = new SQLManager(this, room);
-        final ChatData[] data = sql.getAll();
+        final ChatData[] data = sql.get300();
 
         final ArrayList<Item> items = new ArrayList<>();
         for (ChatData datum : data) {
