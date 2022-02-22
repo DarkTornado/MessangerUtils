@@ -61,12 +61,7 @@ public class MainActivity extends Activity {
         toolbar = Utils.createToolBar(this, "메신저 도구");
         Switch on = new Switch(this);
         on.setChecked(Utils.rootLoad(this, "all_on", false));
-        on.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton swit, boolean onoff) {
-                Utils.rootSave(MainActivity.this, "all_on", onoff);
-            }
-        });
+        on.setOnCheckedChangeListener((swit, onoff) -> Utils.rootSave(MainActivity.this, "all_on", onoff));
         toolbar.addView(on, new Toolbar.LayoutParams(-2, -2, Gravity.RIGHT));
 
         setActionBar(toolbar);

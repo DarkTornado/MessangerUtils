@@ -76,6 +76,10 @@ public class ListAdapter extends BaseAdapter {
         this.list.addAll(list);
     }
 
+    public void addItem(Item item) {
+        this.list.add(0, item);
+    }
+
     private int dip2px(Context ctx, int dips) {
         return (int) Math.ceil(dips * ctx.getResources().getDisplayMetrics().density);
     }

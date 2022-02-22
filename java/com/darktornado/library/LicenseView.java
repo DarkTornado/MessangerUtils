@@ -39,7 +39,6 @@ public class LicenseView extends LinearLayout {
         }
     }
 
-
     private void init() {
         setOrientation(1);
         int pad = dip2px(10);
