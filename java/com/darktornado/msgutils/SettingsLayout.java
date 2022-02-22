@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.view.Menu;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
@@ -14,6 +15,7 @@ import android.widget.RadioGroup;
 import android.widget.ScrollView;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class SettingsLayout extends BaseLayout {
 
@@ -265,7 +267,7 @@ public class SettingsLayout extends BaseLayout {
             layout.addView(sws[n]);
         }
 
-        String[] menus = {"알림 접근 허용", "Wear OS 설치", "세션 초기화", "반응할 앱 설정", "태그 목록", "API 목록", "기능 정보 / 도움말", "라이선스 정보"};
+        String[] menus = {"알림 접근 허용", "Wear OS 설치", "세션 초기화", "반응할 앱 설정", "알림 파싱 설정", "태그 & API 목록", "기능 정보 / 도움말", "라이선스 정보"};
         Button[] btns = new Button[menus.length];
         LinearLayout.LayoutParams margin = new LinearLayout.LayoutParams(-1, -2, 1);
         int mar = dip2px(1);
@@ -305,15 +307,16 @@ public class SettingsLayout extends BaseLayout {
                             inputPackageName();
                             break;
                         case 4:
+                            notiParseSettings();
+                            break;
+                        case 5:
+                            //나중에 고르는 다이얼로그 넣을 것
                             showDialog("단순 자동응답 태그 목록", "[[보낸사람]]\n" +
                                     "  -> 보낸 사람의 이름을 인용합니다.\n\n" +
                                     "[[내용]]\n" +
                                     "  -> 수신된 채팅의 내용을 인용합니다.\n\n" +
                                     "[[방]]\n" +
                                     "  -> 채팅이 수신된 방의 이름을 인용합니다.");
-                            break;
-                        case 5:
-
                             break;
                         case 6:
 
@@ -377,6 +380,92 @@ public class SettingsLayout extends BaseLayout {
         dialog.setPositiveButton("확인", (dialog1, which) -> {
             String input = txt.getText().toString();
             Utils.rootSave(ctx, "roomList" + type, input);
+            toast("저장되었습니다.");
+        });
+        dialog.show();
+    }
+
+    private void notiParseSettings() {
+        AlertDialog.Builder dialog = new AlertDialog.Builder(ctx);
+        dialog.setTitle("알림 파싱 설정");
+        LinearLayout layout = new LinearLayout(ctx);
+        layout.setOrientation(1);
+
+        TextView msg1 = new TextView(ctx);
+        msg1.setText("msg : ");
+        msg1.setTextSize(17);
+        msg1.setTextColor(Color.BLACK);
+        layout.addView(msg1);
+        final EditText msg2 = new EditText(ctx);
+        msg2.setHint("msg 입력");
+        layout.addView(msg2);
+        final EditText msg3 = new EditText(ctx);
+        msg3.setHint("대체 msg 입력");
+        layout.addView(msg3);
+
+        TextView room1 = new TextView(ctx);
+        room1.setText("\nroom : ");
+        room1.setTextSize(17);
+        room1.setTextColor(Color.BLACK);
+        layout.addView(room1);
+        final EditText room2 = new EditText(ctx);
+        room2.setHint("room 입력");
+        layout.addView(room2);
+        final EditText room3 = new EditText(ctx);
+        room3.setHint("대체 room 입력");
+        layout.addView(room3);
+
+        TextView sender1 = new TextView(ctx);
+        sender1.setText("\nsender : ");
+        sender1.setTextSize(17);
+        sender1.setTextColor(Color.BLACK);
+        layout.addView(sender1);
+        final EditText sender2 = new EditText(ctx);
+        sender2.setHint("sender 입력");
+        layout.addView(sender2);
+        final EditText sender3 = new EditText(ctx);
+        sender3.setHint("대체 sender 입력");
+        layout.addView(sender3);
+
+        TextView igc1 = new TextView(ctx);
+        igc1.setText("\nisGroupChat : ");
+        igc1.setTextSize(17);
+        igc1.setTextColor(Color.BLACK);
+        layout.addView(igc1);
+        final CheckBox ch = new CheckBox(ctx);
+        ch.setText("room으로 알아서 처리");
+        ch.setChecked(NotiListener.KEY_IGC_ROOM);
+        layout.addView(ch);
+        final EditText igc2 = new EditText(ctx);
+        igc2.setHint("isGroupChat 입력");
+        layout.addView(igc2);
+
+        msg2.setText(NotiListener.KEY_MSG);
+        msg3.setText(NotiListener.KEY_MSG_ALTER);
+        room2.setText(NotiListener.KEY_ROOM);
+        room3.setText(NotiListener.KEY_ROOM_ALTER);
+        sender2.setText(NotiListener.KEY_SENDER);
+        sender3.setText(NotiListener.KEY_SENDER_ALTER);
+        igc2.setText(NotiListener.KEY_IGC);
+
+        int pad = dip2px(10);
+        layout.setPadding(pad, pad, pad, pad);
+        ScrollView scroll = new ScrollView(ctx);
+        scroll.addView(layout);
+        dialog.setView(scroll);
+        dialog.setNegativeButton("취소", null);
+        dialog.setPositiveButton("확인", (dialog1, which) -> {
+            String result = "{" + "\"msg1\":\"" + msg2.getText().toString() + "\"," +
+                    "\"msg2\":\"" + msg3.getText().toString() + "\"," +
+                    "\"room1\":\"" + room2.getText().toString() + "\"," +
+                    "\"room2\":\"" + room3.getText().toString() + "\"," +
+                    "\"sender1\":\"" + sender2.getText().toString() + "\"," +
+                    "\"sender2\":\"" + sender3.getText().toString() + "\"," +
+                    "\"igc\":\"" + igc2.getText().toString() + "\"," +
+                    "\"igc_room\":" + ch.isChecked() +
+                    "}";
+            Utils.rootSave(ctx, "notiParse.json", result);
+            NotiListener.updateNotiParseData(ctx);
             toast("저장되었습니다.");
         });
         dialog.show();

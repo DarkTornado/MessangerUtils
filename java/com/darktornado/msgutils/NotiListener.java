@@ -4,17 +4,18 @@ import android.app.Notification;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
+import android.util.Log;
 
 import com.darktornado.library.PrimitiveWrapFactory;
 import com.darktornado.msgutils.botapi.ImageDB;
 import com.darktornado.msgutils.botapi.Replier;
 import com.darktornado.msgutils.scriptapi.Api;
 
+import org.json.JSONObject;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.ImporterTopLevel;
 import org.mozilla.javascript.ScriptableObject;
@@ -25,7 +26,7 @@ import java.util.HashMap;
 
 public class NotiListener extends NotificationListenerService {
 
-    private HashMap<String, String> preChat = new HashMap<>();
+    private final HashMap<String, String> preChat = new HashMap<>();
 
     public static Context ctx;
     public static HashMap<String, Replier> session = new HashMap<>();
@@ -33,11 +34,22 @@ public class NotiListener extends NotificationListenerService {
     private static Handler handler;
     private static String jsApi = null;
 
+    /* 알림 구조가 바뀌면 사용자가 직접 파싱 방식을 수정 가능하게 변경 */
+    public static String KEY_MSG = "android.text";
+    public static String KEY_MSG_ALTER = "";
+    public static String KEY_ROOM = "android.summaryText";
+    public static String KEY_ROOM_ALTER = "android.subText";
+    public static String KEY_SENDER = "android.title";
+    public static String KEY_SENDER_ALTER = "";
+    public static boolean KEY_IGC_ROOM = true;
+    public static String KEY_IGC = "android.isGroupConversation";
+
     @Override
     public void onCreate() {
         super.onCreate();
         ctx = getApplicationContext();
         handler = new Handler();
+        updateNotiParseData(this);
     }
 
     public static void runOnUiThread(Runnable runnable) {
@@ -52,20 +64,57 @@ public class NotiListener extends NotificationListenerService {
         Notification.WearableExtender wExt = new Notification.WearableExtender(sbn.getNotification());
         for (Notification.Action act : wExt.getActions()) {
             if (act.getRemoteInputs() != null && act.getRemoteInputs().length > 0) {
-                if (act.title.toString().toLowerCase().contains("reply") ||
-                        act.title.toString().toLowerCase().contains("답장")) {
-                    Bundle bundle = sbn.getNotification().extras;
-                    String sender = bundle.getString("android.title");
-                    String msg = bundle.get("android.text").toString();
-                    String room = bundle.getString(Build.VERSION.SDK_INT > 23 ? "android.summaryText" : "android.subText");
-                    boolean isGroupChat = room != null;
+//                if (act.title.toString().toLowerCase().contains("reply") || 없어도 되는 것 같아서 일단 주석처리
+//                        act.title.toString().toLowerCase().contains("답장")) {
+//                    toast(bundle.toString());
+                Bundle bundle = sbn.getNotification().extras;
+
+                /* 수신된 채팅 내용 */
+                Object _msg = bundle.get(KEY_MSG);
+                if (_msg == null) _msg = bundle.get(KEY_MSG_ALTER);
+                String msg = _msg == null ? null : _msg.toString();
+
+                /* 채팅 보낸 사람 */
+                String sender = bundle.getString(KEY_SENDER);
+                if (sender == null) sender = bundle.getString(KEY_SENDER_ALTER);
+
+                /* 채팅이 온 방 */
+                String room = bundle.getString(KEY_ROOM);
+                if (room == null) room = bundle.getString(KEY_ROOM_ALTER);
+
+                /* 단톡/갠톡 구분 */
+                boolean isGroupChat;
+                if (KEY_IGC_ROOM) {
+                    isGroupChat = room != null;
                     if (room == null) room = sender;
-                    Replier replier = new Replier(this, sbn.getNotification().actions, act);
-                    ImageDB imageDB = new ImageDB(this, sbn);
-                    long chatLogId = bundle.getLong("chatLogId");
-                    chatHook(room, msg, sender, isGroupChat, replier, imageDB, chatLogId);
+                } else {
+                    isGroupChat = bundle.getBoolean(KEY_IGC);
                 }
+
+                Replier replier = new Replier(this, sbn.getNotification().actions, act);
+                ImageDB imageDB = new ImageDB(this, sbn);
+                long chatLogId = bundle.getLong("chatLogId");
+
+                chatHook(room, msg, sender, isGroupChat, replier, imageDB, chatLogId);
             }
+        }
+    }
+
+    public static void updateNotiParseData(Context ctx) {
+        try {
+            String data0 = Utils.rootRead(ctx, "notiParse.json");
+            if (data0 == null) return;
+            JSONObject data = new JSONObject(data0);
+            KEY_MSG = data.getString("msg1");
+            KEY_MSG_ALTER = data.getString("msg2");
+            KEY_ROOM = data.getString("room1");
+            KEY_ROOM_ALTER = data.getString("room2");
+            KEY_SENDER = data.getString("sender1");
+            KEY_SENDER_ALTER = data.getString("sender2");
+            KEY_IGC_ROOM = data.getBoolean("igc_room");
+            KEY_IGC = data.getString("igc");
+        } catch (Exception e) {
+            Log.i(Utils.DEBUG, "Failed to update noti parsing data.\n" + e.toString());
         }
     }
 
