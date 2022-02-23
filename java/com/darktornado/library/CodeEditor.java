@@ -17,12 +17,12 @@ import java.util.Stack;
 
 public class CodeEditor extends EditText {
 
-    private Context ctx;
-    private Rect rect;
-    private Paint paint;
+    private final Context ctx;
+    private final Rect rect;
+    private final Paint paint;
     private boolean block = false;
-    private Stack<History> before;
-    private Stack<History> after;
+    private final Stack<History> before;
+    private final Stack<History> after;
     private String search;
     private int searchIndex = 0;
 
@@ -44,7 +44,7 @@ public class CodeEditor extends EditText {
     }
 
     private void initTextWatcher(Context ctx){
-        final String[] blueData = new String[]{"function", "return", "var", "let", "const", "if", "else", "switch", "for", "while", "do", "break", "continue", "case", "in", "with", "true", "false", "new", "null", "undefined", "typeof", "delete", "try", "catch", "finally", "prototype", "this", "super", "default", "indexOf", "length"};
+        final String[] blueData = {"function", "return", "var", "let", "const", "if", "else", "switch", "for", "while", "do", "break", "continue", "case", "in", "with", "true", "false", "new", "null", "undefined", "typeof", "delete", "try", "catch", "finally", "prototype", "this", "super", "default", "indexOf", "length"};
         final String[] redData = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "."};
 
         final CharSequence[] data = new CharSequence[2];
