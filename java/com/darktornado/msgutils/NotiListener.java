@@ -37,8 +37,8 @@ public class NotiListener extends NotificationListenerService {
     /* 알림 구조가 바뀌면 사용자가 직접 파싱 방식을 수정 가능하게 변경 */
     public static String KEY_MSG = "android.text";
     public static String KEY_MSG_ALTER = "";
-    public static String KEY_ROOM = "android.summaryText";
-    public static String KEY_ROOM_ALTER = "android.subText";
+    public static String KEY_ROOM = "android.subText";
+    public static String KEY_ROOM_ALTER = "android.summaryText";
     public static String KEY_SENDER = "android.title";
     public static String KEY_SENDER_ALTER = "";
     public static boolean KEY_IGC_ROOM = true;
