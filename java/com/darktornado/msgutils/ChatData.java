@@ -1,7 +1,5 @@
 package com.darktornado.msgutils;
 
-import android.graphics.Bitmap;
-
 public class ChatData {
     String room;
     String msg;
