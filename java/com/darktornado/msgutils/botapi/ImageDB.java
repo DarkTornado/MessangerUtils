@@ -97,12 +97,15 @@ public class ImageDB {
             icon = sbn.getNotification().largeIcon;
         }
 
+        /* 안드로이드 9 미만에는 android.app.Person이 없음 */
+        if (Build.VERSION.SDK_INT < 28) return new Pair<>(icon, null);
+
         /* 새로운 방식으로 아이콘을 가지고 옴 (안드11 & 카톡9.7.0 대응) */
         Bundle bundle = sbn.getNotification().extras;
         Person person = bundle.getParcelable("android.messagingUser");
 
         /* 없으면 그냥 기존꺼 반환
-        * 안드/카톡 버전 확인 안해도 알아서 됨 */
+         * 안드/카톡 버전 확인 안해도 알아서 됨 */
         if (person == null) return new Pair<>(icon, null);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) { //Person.getIcon(); 때문에 넣음
             return new Pair<>(icon2Bitmap(ctx, person.getIcon()), icon);
