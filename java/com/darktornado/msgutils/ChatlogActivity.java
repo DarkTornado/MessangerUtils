@@ -51,6 +51,9 @@ public class ChatlogActivity extends Activity {
             case 2:
                 loadAllLog();
                 break;
+            case 3:
+                exportLog();
+                break;
             default:
                 deleteDialog(item.getTitle().toString(), item.getItemId());
         }
@@ -62,10 +65,11 @@ public class ChatlogActivity extends Activity {
         menu.add(0, 0, 0, "읽음처리");
         menu.add(0, 1, 0, "응답 전송");
         menu.add(0, 2, 0, "모두 불러오기");
-        menu.add(0, 3, 0, "프로필 사진 삭제");
-        menu.add(0, 4, 0, "사진 파일 삭제");
-        menu.add(0, 5, 0, "대화 내용 삭제");
-        menu.add(0, 6, 0, "채팅방 삭제");
+        menu.add(0, 3, 0, "대화내용 내보내기");
+        menu.add(0, 4, 0, "프로필 사진 삭제");
+        menu.add(0, 5, 0, "사진 파일 삭제");
+        menu.add(0, 6, 0, "대화 내용 삭제");
+        menu.add(0, 7, 0, "채팅방 삭제");
         return true;
     }
 
@@ -286,6 +290,24 @@ public class ChatlogActivity extends Activity {
             chatInfo(data[pos]);
         });
         list.setOnScrollListener(null);
+    }
+
+    private void exportLog() {
+        sql.close();
+        sql = new SQLManager(this, room);
+        final ChatData[] data = sql.getAll();
+        StringBuilder str = new StringBuilder("대화내용 내보내기 - ");
+        str.append(room).append("\n");
+        for (ChatData datum : data) {
+            str.append("--------------------\n")
+                    .append("보낸사람 : ").append(datum.sender).append("\n")
+                    .append("내용 : ").append(datum.msg).append("\n")
+                    .append("시간 : ").append(datum.time).append("\n")
+                    .append("profile_hash : ").append(datum.profile).append("\n")
+                    .append("log_id : ").append(datum.id).append("\n");
+        }
+        Utils.saveFile(SQLManager.sdcard+"/MU/export.txt", str.toString());
+        toast("저장되었어요.");
     }
 
     @Override
