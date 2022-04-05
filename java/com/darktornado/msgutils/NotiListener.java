@@ -61,8 +61,8 @@ public class NotiListener extends NotificationListenerService {
         super.onNotificationPosted(sbn);
         if (!Utils.rootLoad(this, "all_on", false)) return;
         if (!Utils.getPackage(ctx).equals(sbn.getPackageName())) return;
-        Notification.WearableExtender wExt = new Notification.WearableExtender(sbn.getNotification());
-        for (Notification.Action act : wExt.getActions()) {
+        Notification.Action[] actions = getActions(sbn.getNotification());
+        for (Notification.Action act : actions) {
             if (act.getRemoteInputs() != null && act.getRemoteInputs().length > 0) {
 //                if (act.title.toString().toLowerCase().contains("reply") || 없어도 되는 것 같아서 일단 주석처리
 //                        act.title.toString().toLowerCase().contains("답장")) {
@@ -254,6 +254,14 @@ public class NotiListener extends NotificationListenerService {
         return "";
     }
 
+    private Notification.Action[] getActions(Notification noti) {
+        Notification.Action[] acts = noti.actions;
+        if (acts.length > 0) return acts;
+
+        /* 카카오톡 9.7.5부터는 아래 방식으로는 Action이 나오지 않음 */
+        Notification.WearableExtender wExt = new Notification.WearableExtender(noti);
+        return (Notification.Action[]) wExt.getActions().toArray(new Notification.Action[0]);
+    }
 
 
     /*
