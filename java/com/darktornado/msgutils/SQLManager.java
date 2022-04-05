@@ -5,8 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Environment;
 import android.text.format.DateFormat;
 
@@ -55,6 +53,7 @@ public class SQLManager extends SQLiteOpenHelper {
             String name = cursor.getString(cursor.getColumnIndex("name"));
             if (!name.equals("android_metadata")) list.add(name);
         }
+        cursor.close();
         return list.toArray(new String[0]);
     }
 
